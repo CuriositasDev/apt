@@ -1,6 +1,6 @@
 # APT publication operations
 
-The public endpoint is https://projectcuriositas.github.io/apt/, suite stable,
+The public endpoint is https://curiositasdev.github.io/apt/, suite stable,
 component main, architecture amd64. Ubuntu 24.04 and 26.04 are the initial targets.
 Python 3.12+, GnuPG, apt-utils and dpkg-dev are required to build the site.
 

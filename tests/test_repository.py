@@ -42,7 +42,7 @@ class RepositoryTests(unittest.TestCase):
         cls.manifest=cls.root/"manifest.json"
         cls.manifest.write_text(json.dumps({"identity":identity,"artifacts":[{"filename":cls.deb.name,"size":cls.deb.stat().st_size,"sha256":build.sha(cls.deb.read_bytes())}]}))
         gpg("--armor","--local-user",cls.bundle+"!","--output",str(cls.root/"manifest.json.asc"),"--detach-sign",str(cls.manifest))
-        cls.config={"schema":1,"base_url":"https://projectcuriositas.github.io/apt/",
+        cls.config={"schema":1,"base_url":"https://curiositasdev.github.io/apt/",
             "primary_fingerprint":cls.primary,"apt_signing_fingerprint":cls.apt,"bundle_signing_fingerprint":cls.bundle,
             "releases":[{"version":"0.15.0","tag":"v0.15.0","commit":cls.commit,"manifest_sha256":build.sha(cls.manifest.read_bytes()),
                          "deb_sha256":build.sha(cls.deb.read_bytes()),"deb_size":cls.deb.stat().st_size}]}
@@ -71,7 +71,8 @@ class RepositoryTests(unittest.TestCase):
         for change in [lambda c:c["releases"][0].update(version="0.15.0-rc.1"),
                        lambda c:c["releases"].append(c["releases"][0]),
                        lambda c:c["releases"][0].update(commit="main"),
-                       lambda c:c.update(primary_fingerprint=None)]:
+                       lambda c:c.update(primary_fingerprint=None),
+                       lambda c:c.update(base_url="https://projectcuriositas.github.io/apt/")]:
             config=copy.deepcopy(self.config);change(config)
             with self.assertRaises(ValueError):build.config_check(config)
 
@@ -81,6 +82,10 @@ class RepositoryTests(unittest.TestCase):
             self.assertEqual((out/"pool/main/m/mognitio"/self.deb.name).read_bytes(),self.deb.read_bytes())
             self.assertIn("Valid-Until:",(out/"dists/stable/Release").read_text())
             self.assertIn("sudo apt install mognitio",(out/"index.html").read_text())
+            page=(out/"index.html").read_text()
+            self.assertIn("https://curiositasdev.github.io/apt/keys/mognitio.asc",page)
+            self.assertIn("https://curiositasdev.github.io/apt/ stable main",page)
+            self.assertNotIn("https://projectcuriositas.github.io/apt/",page)
             for p in out.rglob("*"):
                 if p.is_file():
                     self.assertNotIn(b"PRIVATE KEY",p.read_bytes())
