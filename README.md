@@ -1,9 +1,9 @@
 # ProjectCuriositas APT repository
 
-Signed Linux distribution hosted at [GitHub Pages](https://projectcuriositas.github.io/apt/).
+Signed Linux distribution hosted at [GitHub Pages](https://curiositasdev.github.io/apt/).
 
-Mognitio 1.5.0 is pinned in repository.json by its formal release commit, signed
-manifest and Debian package digest. Follow the Pages installation instructions
+Published Mognitio versions are pinned in repository.json by their formal release
+commits, signed manifests and Debian package digests. Follow the Pages installation instructions
 after successful deployment; the site verifies signed metadata before publication.
 
 Supported initial target: Mognitio on Ubuntu 24.04 and 26.04 amd64, stable/main.

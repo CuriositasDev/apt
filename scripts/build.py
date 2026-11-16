@@ -37,7 +37,7 @@ def fetch(url, limit):
     return data
 
 def config_check(config):
-    if config.get("schema") != 1 or config.get("base_url") != "https://projectcuriositas.github.io/apt/":
+    if config.get("schema") != 1 or config.get("base_url") != "https://curiositasdev.github.io/apt/":
         raise ValueError("Unexpected repository identity")
     releases = config["releases"]
     if not isinstance(releases, list):
@@ -205,12 +205,12 @@ def landing(site, config):
         body += "An independent verification website is not yet available.</p>"
         commands = (
             "sudo apt update\nsudo apt install --no-install-recommends ca-certificates curl gnupg\n"
-            "curl -fsSLo mognitio.asc https://projectcuriositas.github.io/apt/keys/mognitio.asc\n"
+            "curl -fsSLo mognitio.asc https://curiositasdev.github.io/apt/keys/mognitio.asc\n"
             "gpg --show-keys --with-fingerprint mognitio.asc\n"
             "# Compare the complete primary fingerprint above before continuing.\n"
             "sudo install -d -m 0755 /etc/apt/keyrings\n"
             "sudo install -m 0644 mognitio.asc /etc/apt/keyrings/mognitio.asc\n"
-            "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/mognitio.asc] https://projectcuriositas.github.io/apt/ stable main' | sudo tee /etc/apt/sources.list.d/mognitio.list\n"
+            "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/mognitio.asc] https://curiositasdev.github.io/apt/ stable main' | sudo tee /etc/apt/sources.list.d/mognitio.list\n"
             "sudo apt update\nsudo apt install mognitio\n")
         body += "<pre>"+html.escape(commands)+"</pre>"
         body += "<p>Metadata expires after 14 days and is renewed weekly. Do not bypass signature or expiry errors.</p>"

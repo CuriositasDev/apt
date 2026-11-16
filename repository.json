@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "base_url": "https://projectcuriositas.github.io/apt/",
+  "base_url": "https://curiositasdev.github.io/apt/",
   "primary_fingerprint": "C44A5AA9313FFA686779C262333C4A7C92BCBDA3",
   "apt_signing_fingerprint": "686C282ED80F64536B215571FC0DDC08D041EC45",
   "bundle_signing_fingerprint": "4245611FC8A78B4B900CDF4F6CA5FC1ED455DC71",
@@ -84,6 +84,14 @@
       "manifest_sha256": "1872bb33af3c8b713080e87dfa061b1026dccfba2c40c9bb2b93154b2c710750",
       "deb_sha256": "8c9e31355b01ee7974e48443b4833211e1b65f5a0281de612689c069f9936c46",
       "deb_size": 10083564
+    },
+    {
+      "version": "1.8.0",
+      "tag": "v1.8.0",
+      "commit": "e58a66ab699ec78643349f806cb068bcba9e0834",
+      "manifest_sha256": "0e5349864ecf788c8249f0b96d3ef05609ae5c7fb6353fb5b49c17d22ae01635",
+      "deb_sha256": "ccd4986d2c327066ba19d531dd5cfb88afc7255dce52c8b7729ed6bdbc018e83",
+      "deb_size": 10082860
     }
   ]
 }
