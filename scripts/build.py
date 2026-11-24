@@ -17,10 +17,12 @@ import tempfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parent.parent
-UPSTREAM = "ProjectCuriositas/Mognitio"
+UPSTREAM = "CuriositasDev/Mognitio"
+UPSTREAM_API = "https://api.github.com/repos/" + UPSTREAM + "/"
 
 def run(args, **kwargs):
     env = dict(kwargs.pop("env", os.environ))
+    env.pop("GITHUB_TOKEN", None)
     env.pop("APT_SIGNING_KEY", None)
     env.pop("APT_SIGNING_PASSPHRASE", None)
     return subprocess.run(list(map(str, args)), check=True, capture_output=True, env=env, **kwargs).stdout
@@ -30,6 +32,9 @@ def sha(data):
 
 def fetch(url, limit):
     request = urllib.request.Request(url, headers={"User-Agent": "ProjectCuriositas-APT"})
+    token = os.environ.get("GITHUB_TOKEN")
+    if token and url.startswith(UPSTREAM_API):
+        request.add_unredirected_header("Authorization", "Bearer " + token)
     with urllib.request.urlopen(request, timeout=60) as response:
         data = response.read(limit + 1)
     if len(data) > limit:
@@ -73,17 +78,16 @@ def verify_signature(keyring, signature, document, primary, signer):
 
 def release_package(release, config, keyring, directory):
     tag = release["tag"]
-    api = "https://api.github.com/repos/" + UPSTREAM
-    published = json.loads(fetch(api + "/releases/tags/" + tag, 1024*1024))
+    published = json.loads(fetch(UPSTREAM_API + "releases/tags/" + tag, 1024*1024))
     if published["draft"] or published["prerelease"] or published["tag_name"] != tag:
         raise ValueError("The pinned release is not a published formal release")
-    ref = json.loads(fetch(api + "/git/ref/tags/" + tag, 65536))["object"]
+    ref = json.loads(fetch(UPSTREAM_API + "git/ref/tags/" + tag, 65536))["object"]
     for _ in range(4):
         if ref["type"] == "commit":
             break
         if ref["type"] != "tag":
             raise ValueError("Invalid release tag object")
-        ref = json.loads(fetch(api + "/git/tags/" + ref["sha"],65536))["object"]
+        ref = json.loads(fetch(UPSTREAM_API + "git/tags/" + ref["sha"],65536))["object"]
     if ref["type"] != "commit" or ref["sha"] != release["commit"]:
         raise ValueError("Release tag no longer matches the reviewed commit")
     base = "https://github.com/" + UPSTREAM + "/releases/download/" + tag + "/"

@@ -20,6 +20,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends apt-utils dpkg-dev gnupg
       - name: Verify release bytes and sign repository
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
           APT_SIGNING_PASSPHRASE: ${{ secrets.APT_SIGNING_PASSPHRASE }}
         run: python3 scripts/build.py --output _site
