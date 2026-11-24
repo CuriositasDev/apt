@@ -1,6 +1,7 @@
 """Exercise signature boundaries using disposable, passphrase-protected keys."""
 import copy
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,22 @@ ROOT=Path(__file__).resolve().parent.parent
 spec=importlib.util.spec_from_file_location("apt_build",ROOT/"scripts/build.py")
 build=importlib.util.module_from_spec(spec);spec.loader.exec_module(build)
 PASSWORD="disposable-test-key-passphrase"
+
+class MetadataRequestTests(unittest.TestCase):
+    def test_token_is_scoped_to_upstream_metadata_and_never_redirected(self):
+        metadata = build.UPSTREAM_API + "releases/tags/v1.9.0"
+        asset = "https://github.com/CuriositasDev/Mognitio/releases/download/v1.9.0/manifest.json"
+        for url, token, expected in ((metadata, "test-only", "Bearer test-only"),
+                                     (metadata, "", None), (asset, "test-only", None)):
+            with self.subTest(url=url, authorized=bool(token)), patch.dict(os.environ, GITHUB_TOKEN=token):
+                with patch.object(build.urllib.request, "urlopen", return_value=io.BytesIO(b"ok")) as open_url:
+                    self.assertEqual(build.fetch(url, 2), b"ok")
+                request = open_url.call_args.args[0]
+                self.assertEqual(request.get_header("Authorization"), expected)
+                redirected = build.urllib.request.HTTPRedirectHandler().redirect_request(
+                    request, None, 302, "Found", {}, "https://example.org/redirect")
+                self.assertIsNone(redirected.get_header("Authorization"))
+
 
 class RepositoryTests(unittest.TestCase):
     @classmethod
